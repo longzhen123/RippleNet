@@ -1,4 +1,3 @@
-import random
 import time
 import numpy as np
 import torch.nn as nn
@@ -180,10 +179,6 @@ def get_ripple_set(train_dict, kg_dict, H, size):
 
 def train(args, is_topk=False):
     np.random.seed(123)
-    t.manual_seed(123)
-    t.cuda.manual_seed(123)
-    t.cuda.manual_seed_all(123)
-    random.seed(123)
 
     data = load_data(args)
     n_entity, n_user, n_item, n_relation = data[0], data[1], data[2], data[3]
