@@ -1,3 +1,4 @@
+import random
 import time
 import numpy as np
 import torch.nn as nn
@@ -134,7 +135,7 @@ def eval_ctr(model, pairs, ripple_sets, batch_size):
     pred_np[pred_np < 0.5] = 0
     pred_label = pred_np.tolist()
     acc = accuracy_score(true_label, pred_label)
-    return round(auc, 3), round(acc, 3)
+    return auc, acc
 
 
 def get_ripple_set(train_dict, kg_dict, H, size):
@@ -178,7 +179,11 @@ def get_ripple_set(train_dict, kg_dict, H, size):
 
 
 def train(args, is_topk=False):
-    np.random.seed(555)
+    np.random.seed(123)
+    t.manual_seed(123)
+    t.cuda.manual_seed(123)
+    t.cuda.manual_seed_all(123)
+    random.seed(123)
 
     data = load_data(args)
     n_entity, n_user, n_item, n_relation = data[0], data[1], data[2], data[3]
@@ -238,8 +243,8 @@ def train(args, is_topk=False):
         eval_auc, eval_acc = eval_ctr(model, eval_set, ripple_sets, args.batch_size)
         test_auc, test_acc = eval_ctr(model, test_set, ripple_sets, args.batch_size)
 
-        print('epoch: %d \t train_auc: %.3f \t train_acc: %.3f \t '
-              'eval_auc: %.3f \t eval_acc: %.3f \t test_auc: %.3f \t test_acc: %.3f \t' %
+        print('epoch: %d \t train_auc: %.4f \t train_acc: %.4f \t '
+              'eval_auc: %.4f \t eval_acc: %.4f \t test_auc: %.4f \t test_acc: %.4f \t' %
               ((epoch + 1), train_auc, train_acc, eval_auc, eval_acc, test_auc, test_acc), end='\t')
 
         precision_list = []
@@ -260,8 +265,8 @@ def train(args, is_topk=False):
 
     indices = eval_auc_list.index(max(eval_auc_list))
     print(args.dataset, end='\t')
-    print('train_auc: %.3f \t train_acc: %.3f \t eval_auc: %.3f \t eval_acc: %.3f \t '
-          'test_auc: %.3f \t test_acc: %.3f \t' %
+    print('train_auc: %.4f \t train_acc: %.4f \t eval_auc: %.4f \t eval_acc: %.4f \t '
+          'test_auc: %.4f \t test_acc: %.4f \t' %
           (train_auc_list[indices], train_acc_list[indices], eval_auc_list[indices], eval_acc_list[indices],
            test_auc_list[indices], test_acc_list[indices]), end='\t')
 
